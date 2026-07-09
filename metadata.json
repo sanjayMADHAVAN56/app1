@@ -1,0 +1,6 @@
+{
+  "name": "Outlet Gadgets",
+  "description": "A professional e-commerce platform specializing in Refurbished Electronics, Open Box Products, and Clearance Gadgets, featuring an integrated AI recommendation engine, smart semantic search, and developer code explorer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

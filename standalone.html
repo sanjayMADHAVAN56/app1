@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outlet Gadgets - Standalone Interactive Frontend</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.25);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.45);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500/30">
+    
+    <!-- React Entry Container -->
+    <div id="root" class="min-h-screen flex flex-col"></div>
+
+    <!-- React, ReactDOM, and Babel CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Transpiled Core React Application -->
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Dynamic Lucide Icon Component (UMD CDN version)
+        const Icon = ({ name, className = "h-5 w-5 inline-block shrink-0", ...props }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+
+            // Map CamelCase React icon names to Lucide Kebab-case formats
+            const kebabName = name
+                .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+                .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+                .toLowerCase();
+
+            return <i data-lucide={kebabName} className={className} {...props}></i>;
+        };
+
+        // Static Hardcoded Mock Datasets (faithful to server.ts database state)
+        const INITIAL_PRODUCTS = [
+            {
+                id: 1,
+                name: "Apple MacBook Pro 14\" (M2 Pro)",
+                brand: "Apple",
+                category: "Laptops",
+                originalPrice: 199900,
+                price: 129900,
+                rating: 4.9,
+                conditionGrade: "LIKE_NEW",
+                stock: 4,
+                description: "Stunning space grey Apple Silicon notebook featuring the M2 Pro chip with 10-core CPU and 16-core GPU, 16GB of unified memory, and 512GB of super-fast SSD storage.",
+                specifications: {
+                    "Processor": "Apple M2 Pro (10-Core CPU, 16-Core GPU)",
+                    "Unified Memory": "16GB RAM",
+                    "Storage": "512GB NVMe SSD",
+                    "Screen Size": "14.2-inch Liquid Retina XDR",
+                    "Battery Health": "98% (Original Apple Cell)"
+                },
+                refurbishedDetails: "Screen assembly meets 100% factory brightness specifications. Completely cleaned of internal dust. Passed 45-point hardware telemetry check.",
+                imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=60",
+                isFeatured: true
+            },
+            {
+                id: 3,
+                name: "iPhone 14 Pro Max 256GB Space Black",
+                brand: "Apple",
+                category: "Smartphones",
+                originalPrice: 139900,
+                price: 84900,
+                rating: 4.9,
+                conditionGrade: "LIKE_NEW",
+                stock: 8,
+                description: "Premium flagship iPhone in pristine cosmetic condition. Features the revolutionary Dynamic Island, 48MP high-resolution camera system, and Always-On display.",
+                specifications: {
+                    "Chipset": "A16 Bionic Chip",
+                    "Storage": "256GB NVMe",
+                    "Camera": "Triple (48MP + 12MP + 12MP) with LIDAR",
+                    "Display": "6.7-inch Super Retina XDR OLED",
+                    "Battery Health": "100% (Certified Replacement Battery)"
+                },
+                refurbishedDetails: "Battery replaced with premium 100% health battery. TrueTone functionality fully restored. Clean IMEI, unlocked for all carriers.",
+                imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=60",
+                isFeatured: true
+            },
+            {
+                id: 4,
+                name: "Samsung Galaxy S23 Ultra 256GB",
+                brand: "Samsung",
+                category: "Smartphones",
+                originalPrice: 124999,
+                price: 72900,
+                rating: 4.7,
+                conditionGrade: "EXCELLENT",
+                stock: 6,
+                description: "Ultimate Android powerhouse featuring a 200MP sensor, integrated S-Pen, and Snapdragon 8 Gen 2 for Galaxy chip. Minor scratch on the rear bezel.",
+                specifications: {
+                    "Processor": "Snapdragon 8 Gen 2 for Galaxy",
+                    "RAM": "12GB RAM",
+                    "Storage": "256GB UFS 4.0",
+                    "Display": "6.8-inch Dynamic AMOLED 2X",
+                    "Battery Health": "94% (Original)"
+                },
+                refurbishedDetails: "Stylus connector and pressure sensors thoroughly tested. Mainboard professionally micro-cleaned and disinfected.",
+                imageUrl: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&auto=format&fit=crop&q=60",
+                isFeatured: true
+            },
+            {
+                id: 5,
+                name: "iPad Pro 12.9\" (M2, Wi-Fi)",
+                brand: "Apple",
+                category: "Tablets",
+                originalPrice: 112900,
+                price: 82900,
+                rating: 4.8,
+                conditionGrade: "LIKE_NEW",
+                stock: 4,
+                description: "Professional drawing and productivity slate running on the ultra-powerful Apple M2 chip. Supports 2nd Gen Apple Pencil and Hover gestures.",
+                specifications: {
+                    "Processor": "Apple M2 (8-Core CPU, 10-Core GPU)",
+                    "RAM": "8GB RAM",
+                    "Storage": "128GB High Speed",
+                    "Display": "12.9-inch Liquid Retina XDR",
+                    "Battery Health": "96% (Original)"
+                },
+                refurbishedDetails: "Screen and backlight assembly fully inspected. No Mini-LED degradation. Includes premium pre-applied matte guard.",
+                imageUrl: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&auto=format&fit=crop&q=60",
+                isFeatured: false
+            },
+            {
+                id: 6,
+                name: "Lenovo ThinkPad X1 Carbon Gen 10",
+                brand: "Lenovo",
+                category: "Laptops",
+                originalPrice: 180000,
+                price: 74900,
+                rating: 4.6,
+                conditionGrade: "VERY_GOOD",
+                stock: 7,
+                description: "The gold standard of enterprise laptops. Built from carbon fiber with legendary tactile keyboard, outstanding security, and all-day battery performance.",
+                specifications: {
+                    "Processor": "Intel Core i7-1260U (vPro)",
+                    "RAM": "16GB LPDDR5",
+                    "Storage": "512GB NVMe SSD",
+                    "Display": "14-inch WUXGA Anti-Glare",
+                    "Battery Health": "89% (Original)"
+                },
+                refurbishedDetails: "Keyboard tested at 100% keycap response. Compliant with military-grade durability checklists. External carbon shell deep-cleaned.",
+                imageUrl: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=60"
+            },
+            {
+                id: 8,
+                name: "Sony WH-1000XM5 ANC Headphones",
+                brand: "Sony",
+                category: "Audio & Accessories",
+                originalPrice: 34990,
+                price: 21900,
+                rating: 4.8,
+                conditionGrade: "LIKE_NEW",
+                stock: 10,
+                description: "Industry-leading active noise cancelling overhead headphones with incredible smart listening features, pristine sound, and 30-hour battery life.",
+                specifications: {
+                    "Drivers": "30mm High Quality Neodymium Dome",
+                    "ANC": "Dual Processor Custom HD Noise Cancelling QN1",
+                    "Battery Life": "Up to 30 Hours (ANC On)",
+                    "Condition": "Like New, Original carrying case included"
+                },
+                refurbishedDetails: "Passed audio frequency sweep analysis. Microphone array fully recalibrated. Ear cushions replaced with fresh OEM memory foam.",
+                imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=60",
+                isFeatured: true
+            }
+        ];
+
+        const INITIAL_REVIEWS = [
+            { id: 101, productId: 1, author: "Aravind K.", rating: 5, comment: "Absolutely brand new. Scratched my head trying to find any flaws. High-quality packaging too!", date: "2026-06-29" },
+            { id: 102, productId: 3, author: "Meera Sen", rating: 5, comment: "Dynamic Island works beautifully, battery level was exactly at 100% as advertised. Super happy with the savings!", date: "2026-07-02" },
+            { id: 103, productId: 4, author: "Rohan J.", rating: 4, comment: "Integrated stylus works flawlessly. There was a tiny scratch on the camera ring as mentioned, but it has zero impact on images.", date: "2026-07-01" }
+        ];
+
+        const INITIAL_NOTIFICATIONS = [
+            { id: 1, title: "Diagnostic Pipeline Connected", message: "45-point engineering telemetries successfully hooked to our live sandbox API.", isRead: false, date: "2026-07-06T05:00:00.000Z" },
+            { id: 2, title: "Flash Sale Alert", message: "Use checkout coupon 'REFURB20' to claim an instant flat 20% discount!", isRead: false, date: "2026-07-06T04:30:00.000Z" }
+        ];
+
+        const JAVA_FILES = [
+            { name: "ProductController.java", type: "Controller", content: `package com.outletgadget.controller;\n\nimport com.outletgadget.model.Product;\nimport com.outletgadget.repository.ProductRepository;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.web.bind.annotation.*;\nimport java.util.List;\n\n@RestController\n@RequestMapping("/api/products")\n@CrossOrigin(origins = "*")\npublic class ProductController {\n\n    @Autowired\n    private ProductRepository productRepository;\n\n    @GetMapping\n    public ResponseEntity<List<Product>> getAllProducts(\n            @RequestParam(required = false) String category,\n            @RequestParam(required = false) String condition) {\n        if (category != null && condition != null) {\n            return ResponseEntity.ok(productRepository.findByCategoryAndConditionGrade(category, condition));\n        }\n        return ResponseEntity.ok(productRepository.findAll());\n    }\n}` },
+            { name: "Product.java", type: "Entity", content: `package com.outletgadget.model;\n\nimport jakarta.persistence.*;\nimport lombok.*;\n\n@Entity\n@Table(name = "products")\n@Data\n@NoArgsConstructor\n@AllArgsConstructor\n@Builder\npublic class Product {\n    @Id\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\n    private Long id;\n    \n    private String name;\n    private String brand;\n    private String category;\n    private Double originalPrice;\n    private Double price;\n    private Double rating;\n    \n    @Column(name = "condition_grade")\n    private String conditionGrade;\n    private Integer stock;\n    private String description;\n}` },
+            { name: "schema.sql", type: "Database Schema", content: `-- Outlet Gadgets Postgres/SQL Schema Initialization\n\nCREATE TABLE IF NOT EXISTS products (\n    id SERIAL PRIMARY KEY,\n    name VARCHAR(255) NOT NULL,\n    brand VARCHAR(100) NOT NULL,\n    category VARCHAR(100) NOT NULL,\n    original_price NUMERIC(12,2) NOT NULL,\n    price NUMERIC(12,2) NOT NULL,\n    rating NUMERIC(2,1) DEFAULT 5.0,\n    condition_grade VARCHAR(50) NOT NULL,\n    stock INT DEFAULT 1,\n    description TEXT,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);` }
+        ];
+
+        const API_ENDPOINTS = [
+            { method: "GET", path: "/api/products", desc: "Retrieve active certified refurbished products", payload: null },
+            { method: "GET", path: "/api/products/categories", desc: "List supported electronics categories", payload: null },
+            { method: "GET", path: "/api/notifications", desc: "Retrieve support alert logs", payload: null },
+            { method: "POST", path: "/api/developer/convert", desc: "Submit TSX component translation schema", payload: { code: "const Comp = () => {}", targetType: "Controller" } }
+        ];
+
+        const SAMPLE_SNIPPETS = [
+            {
+                name: "ProductGrid.tsx (React Component)",
+                type: "Controller",
+                code: `import React, { useState } from 'react';\n\ninterface Product {\n  id: number;\n  name: string;\n  price: number;\n  condition: string;\n}\n\nexport default function ProductGrid() {\n  const [items, setItems] = useState<Product[]>([]);\n  const [loading, setLoading] = useState(false);\n\n  const fetchProducts = async (category: string) => {\n    setLoading(true);\n    const res = await fetch(\`/api/products?category=\${category}\`);\n    const data = await res.json();\n    setItems(data.data);\n    setLoading(false);\n  };\n\n  return (\n    <div>\n      {loading ? <p>Loading...</p> : items.map(item => (\n        <div key={item.id}>\n          <h3>{item.name}</h3>\n          <p>Price: \${item.price}</p>\n        </div>\n      ))}\n    </div>\n  );\n}`
+            },
+            {
+                name: "DeviceDashboard.tsx (Interactive Widget)",
+                type: "HTML",
+                code: `import React, { useState } from 'react';\n\nexport default function DeviceDashboard() {\n  const [search, setSearch] = useState("");\n  const [warranty, setWarranty] = useState(true);\n  \n  const devices = [\n    { name: "Apple iPad Pro M2", price: 499, warranty: true },\n    { name: "Samsung Galaxy Tab S8", price: 299, warranty: false }\n  ];\n\n  return (\n    <div className="p-6 bg-slate-900 rounded-xl space-y-4 shadow-xl border border-slate-800">\n      <h2 className="text-xl font-bold text-white tracking-tight">Outlet Device Radar</h2>\n    </div>\n  );\n}`
+            }
+        ];
+
+        // ==========================================
+        // MAIN APPLICATION ROOT COMPONENT
+        // ==========================================
+        function App() {
+            // General Navigation
+            const [activeTab, setActiveTab] = useState("home");
+            const [selectedProduct, setSelectedProduct] = useState(null);
+
+            // Authentication state
+            const [user, setUser] = useState({ fullName: "Sanjay Madhavan", email: "sanjaymadhavan56@gmail.com" });
+            const [showAuthModal, setShowAuthModal] = useState(false);
+
+            // Core State hooks synced dynamically from LocalStorage if server isn't running
+            const [products, setProducts] = useState(INITIAL_PRODUCTS);
+            const [categories, setCategories] = useState(["Smartphones", "Laptops", "Tablets", "Audio & Accessories"]);
+            const [selectedCategory, setSelectedCategory] = useState("");
+            const [selectedCondition, setSelectedCondition] = useState("");
+            const [searchQuery, setSearchQuery] = useState("");
+            const [searchFeedback, setSearchFeedback] = useState("");
+            
+            const [cart, setCart] = useState([]);
+            const [wishlist, setWishlist] = useState([]);
+            const [couponCode, setCouponCode] = useState("");
+            const [activeCoupon, setActiveCoupon] = useState(null);
+            const [couponError, setCouponError] = useState("");
+
+            const [checkoutAddress, setCheckoutAddress] = useState({
+                street: "12, College Road, Nungambakkam",
+                city: "Chennai",
+                state: "Tamil Nadu",
+                zip: "600006"
+            });
+            const [paymentMethod, setPaymentMethod] = useState("UPI");
+            const [orders, setOrders] = useState([
+                {
+                    id: "ORD-98472",
+                    date: new Date().toISOString(),
+                    total: 129900,
+                    status: "DELIVERED",
+                    paymentMethod: "UPI",
+                    items: [{ id: 1, name: "Apple MacBook Pro 14\" (M2 Pro)", price: 129900, quantity: 1, imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=60" }],
+                    tracking: [
+                        { status: "Order Placed", date: "2026-06-25 14:32", done: true },
+                        { status: "Packed & Certified", date: "2026-06-25 18:00", done: true },
+                        { status: "Shipped", date: "2026-06-26 09:15", done: true },
+                        { status: "Out for Delivery", date: "2026-06-28 10:45", done: true }
+                    ]
+                }
+            ]);
+            const [activeTrackingOrder, setActiveTrackingOrder] = useState(null);
+            const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+            const [productReviews, setProductReviews] = useState(INITIAL_REVIEWS);
+            const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+
+            // Chat Assistant Widget states
+            const [isChatOpen, setIsChatOpen] = useState(false);
+            const [chatInput, setChatInput] = useState("");
+            const [chatMessages, setChatMessages] = useState([
+                { sender: "bot", text: "Hello! I am your Outlet Gadgets certified diagnostic bot. Ask me anything about our 45-point checks, warranty terms, or developer repositories!", timestamp: "05:00" }
+            ]);
+
+            // Developer Hub Tab States
+            const [devTab, setDevTab] = useState("explorer");
+            const [selectedFile, setSelectedFile] = useState(JAVA_FILES[0]);
+            const [apiSelected, setApiSelected] = useState(API_ENDPOINTS[0]);
+            const [apiLogs, setApiLogs] = useState(null);
+            const [isApiLoading, setIsApiLoading] = useState(false);
+            const [compilerInput, setCompilerInput] = useState(SAMPLE_SNIPPETS[0].code);
+            const [compilerOutput, setCompilerOutput] = useState("");
+            const [compilerTargetType, setCompilerTargetType] = useState("Controller");
+            const [isCompiling, setIsCompiling] = useState(false);
+            const [compilerMessage, setCompilerMessage] = useState("");
+
+            // Dual Hybrid Online/Offline synchronization
+            useEffect(() => {
+                const fetchDatabase = async () => {
+                    try {
+                        const res = await fetch("/api/products");
+                        const data = await res.json();
+                        if (data.success) {
+                            setProducts(data.data);
+                        }
+                    } catch (e) {
+                        console.log("Standalone Mode: Direct Express endpoint unavailable, running on embedded store arrays.");
+                    }
+                };
+                fetchDatabase();
+            }, [selectedCategory, selectedCondition]);
+
+            // Notifications badge count helper
+            const unreadCount = notifications.filter(n => !n.isRead).length;
+
+            const handleApplyCoupon = () => {
+                setCouponError("");
+                if (couponCode.toUpperCase() === "REFURB20") {
+                    setActiveCoupon({ code: "REFURB20", discountPercentage: 20, maxDiscount: 5000 });
+                } else {
+                    setCouponError("Invalid coupon code. Try 'REFURB20'!");
+                }
+            };
+
+            const triggerLocalAlert = (title, message) => {
+                const newN = {
+                    id: Date.now(),
+                    title,
+                    message,
+                    isRead: false,
+                    date: new Date().toISOString()
+                };
+                setNotifications(prev => [newN, ...prev]);
+            };
+
+            const handleAddToCart = (product, qty = 1) => {
+                setCart(prev => {
+                    const existing = prev.find(item => item.product.id === product.id);
+                    if (existing) {
+                        return prev.map(item => item.product.id === product.id ? { ...item, quantity: item.quantity + qty } : item);
+                    }
+                    return [...prev, { product, quantity: qty }];
+                });
+                triggerLocalAlert("Cart Updated", `${product.name} added to your shopping bag.`);
+            };
+
+            const handleRemoveCart = (prodId) => {
+                setCart(prev => prev.filter(item => item.product.id !== prodId));
+            };
+
+            const handleToggleWishlist = (prod) => {
+                setWishlist(prev => {
+                    const isWished = prev.some(w => w.id === prod.id);
+                    if (isWished) {
+                        return prev.filter(w => w.id !== prod.id);
+                    }
+                    return [...prev, prod];
+                });
+            };
+
+            const handlePlaceOrder = () => {
+                const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+                const discount = activeCoupon ? Math.min((total * activeCoupon.discountPercentage) / 100, activeCoupon.maxDiscount) : 0;
+                const grandTotal = total - discount;
+
+                const newOrder = {
+                    id: "ORD-" + Math.floor(10000 + Math.random() * 90000),
+                    date: new Date().toISOString(),
+                    total: grandTotal,
+                    status: "CONFIRMED",
+                    paymentMethod,
+                    items: cart.map(item => ({ id: item.product.id, name: item.product.name, price: item.product.price, quantity: item.quantity })),
+                    tracking: [
+                        { status: "Order Placed", date: "Just now", done: true },
+                        { status: "Packed & Certified", date: "Awaiting check", done: false },
+                        { status: "Shipped", date: "Awaiting courier", done: false }
+                    ]
+                };
+
+                setOrders(prev => [newOrder, ...prev]);
+                setCart([]);
+                setActiveCoupon(null);
+                setCouponCode("");
+                setActiveTrackingOrder(newOrder);
+                setActiveTab("order-success");
+                triggerLocalAlert("Order Placed Successfully", `Order ${newOrder.id} successfully queued for 45-point sanitization checks!`);
+            };
+
+            const handleExecuteApi = async (api) => {
+                setIsApiLoading(true);
+                setApiLogs(null);
+                try {
+                    const res = await fetch(api.path, {
+                        method: api.method,
+                        headers: { "Content-Type": "application/json" },
+                        body: api.payload ? JSON.stringify(api.payload) : null
+                    });
+                    const data = await res.json();
+                    setApiLogs({ status: res.status, body: data });
+                } catch (e) {
+                    // Simulate offline sandbox client response
+                    setTimeout(() => {
+                        let simResult = { success: true, mode: "SANDBOX_SIMULATED" };
+                        if (api.path.includes("products")) simResult.data = products;
+                        else if (api.path.includes("notifications")) simResult.data = notifications;
+                        setApiLogs({ status: 200, body: simResult });
+                        setIsApiLoading(false);
+                    }, 600);
+                    return;
+                }
+                setIsApiLoading(false);
+            };
+
+            const handleCompile = async () => {
+                setIsCompiling(true);
+                setCompilerOutput("");
+                setCompilerMessage("");
+                try {
+                    const res = await fetch("/api/developer/convert", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ code: compilerInput, targetType: compilerTargetType })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        setCompilerOutput(data.javaCode);
+                        setCompilerMessage(data.aiPowered ? "Success: Compiled with Gemini 3.5!" : "Simulated conversion generated successfully.");
+                    } else {
+                        setCompilerMessage("Error: Compilation error mapping elements.");
+                    }
+                } catch (e) {
+                    // Simulated fallback representation mapping
+                    setTimeout(() => {
+                        let simCode = "";
+                        if (compilerTargetType === "HTML") {
+                            simCode = `<!DOCTYPE html>\n<html>\n<head>\n  <script src="https://cdn.tailwindcss.com"></script>\n</head>\n<body class="bg-slate-950 p-6 text-white">\n  <h1 class="text-xl font-bold">Outlet Device Display</h1>\n</body>\n</html>`;
+                        } else {
+                            simCode = `package com.outletgadget.generated;\n\nimport org.springframework.web.bind.annotation.*;\n\n@RestController\n@RequestMapping("/api")\npublic class GeneratedController {\n    @GetMapping("/test")\n    public String test() { return "Refurbished item model"; }\n}`;
+                        }
+                        setCompilerOutput(simCode);
+                        setCompilerMessage("Simulated Translation Mode Active. Add Gemini API Key for dynamic real-time translations.");
+                        setIsCompiling(false);
+                    }, 800);
+                    return;
+                }
+                setIsCompiling(false);
+            };
+
+            const handleSendChat = () => {
+                if (!chatInput.trim()) return;
+                const userMsg = { sender: "user", text: chatInput, timestamp: "Now" };
+                setChatMessages(prev => [...prev, userMsg]);
+                setChatInput("");
+
+                setTimeout(() => {
+                    let text = "I've checked our active inventory. We run 45-point engineering telemetries on all laptops, smartphones, and audio gears. Is there a specific item you are looking to audit?";
+                    if (chatInput.toLowerCase().includes("warranty")) {
+                        text = "All open box and certified refurbished models are backed by our comprehensive 1-Year OutletGadgets hardware warranty covering displays, batteries, and processors.";
+                    } else if (chatInput.toLowerCase().includes("discount") || chatInput.toLowerCase().includes("coupon")) {
+                        text = "You can claim a flat 20% discount on checking out by applying coupon code 'REFURB20'!";
+                    }
+                    setChatMessages(prev => [...prev, { sender: "bot", text, timestamp: "Now" }]);
+                }, 500);
+            };
+
+            return (
+                <div className="flex-1 flex flex-col">
+                    
+                    {/* Header Bar */}
+                    <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+                            
+                            {/* Logo */}
+                            <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setActiveTab("home"); setSelectedProduct(null); }}>
+                                <div className="p-2 bg-emerald-500 text-slate-950 rounded-xl">
+                                    <Icon name="ShoppingBag" className="h-5 w-5" />
+                                </div>
+                                <span className="font-extrabold tracking-tight text-white font-sans text-base sm:text-lg">OUTLET<span className="text-emerald-400 font-medium">GADGETS</span></span>
+                            </div>
+
+                            {/* Search bar inside header */}
+                            <div className="flex-1 max-w-md hidden md:block">
+                                <div className="relative">
+                                    <input 
+                                        type="text"
+                                        placeholder="Search certified products..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && setProducts(INITIAL_PRODUCTS.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase())))}
+                                        className="w-full bg-slate-950 text-xs px-4 py-2 pl-10 rounded-xl border border-slate-800 focus:outline-none focus:border-emerald-500/80 text-slate-200"
+                                    />
+                                    <Icon name="Search" className="h-4 w-4 text-slate-500 absolute left-3 top-2.5" />
+                                </div>
+                            </div>
+
+                            {/* Header action menu */}
+                            <nav className="flex items-center gap-1 sm:gap-3">
+                                <button onClick={() => { setActiveTab("home"); setSelectedProduct(null); }} className={`p-2 rounded-lg text-xs font-semibold ${activeTab === "home" ? "text-emerald-400" : "text-slate-400 hover:text-slate-200"}`}>Store</button>
+                                <button onClick={() => { setActiveTab("developer-hub"); }} className={`p-2 rounded-lg text-xs font-semibold ${activeTab === "developer-hub" ? "text-indigo-400" : "text-slate-400 hover:text-slate-200"}`}>Developer Hub</button>
+                                <button onClick={() => { setActiveTab("admin"); }} className={`p-2 rounded-lg text-xs font-semibold ${activeTab === "admin" ? "text-amber-400" : "text-slate-400 hover:text-slate-200"}`}>Analytics</button>
+                                
+                                {/* Notification and cart icons */}
+                                <button onClick={() => { triggerLocalAlert("All Caught Up", "Your notifications are fully up to date!"); }} className="p-2 text-slate-400 hover:text-slate-200 relative">
+                                    <Icon name="Bell" className="h-4.5 w-4.5" />
+                                    {unreadCount > 0 && <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-rose-500" />}
+                                </button>
+                                <button onClick={() => { setActiveTab("cart"); }} className="p-2 text-slate-400 hover:text-slate-200 relative">
+                                    <Icon name="ShoppingBag" className="h-4.5 w-4.5" />
+                                    {cart.length > 0 && <span className="absolute -top-0.5 -right-0.5 bg-emerald-500 text-slate-950 font-bold font-mono text-[9px] h-4 w-4 flex items-center justify-center rounded-full">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>}
+                                </button>
+                            </nav>
+                        </div>
+                    </header>
+
+                    {/* Main workspace container */}
+                    <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                        
+                        {/* Tab View: Catalog storefront */}
+                        {activeTab === "home" && !selectedProduct && (
+                            <div className="space-y-8 animate-fade-in">
+                                
+                                {/* Hero banner */}
+                                <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-indigo-950/30 border border-slate-800 rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div className="space-y-4 max-w-lg">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-semibold text-emerald-400 rounded-full">
+                                            <Icon name="Sparkles" className="h-3 w-3" />
+                                            STANDALONE HTML BUNDLE ACTIVE
+                                        </span>
+                                        <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">Certified Premium Tech <br /><span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">Outlet Clearance Deals</span></h1>
+                                        <p className="text-xs sm:text-sm text-slate-300">Explore premium devices passing strict 45-point hardware diagnostic checkups. Completely standalone-compliant with live local simulation fallbacks.</p>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => { setProducts(INITIAL_PRODUCTS); setSelectedCategory(""); }} className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-semibold px-4 py-2 rounded-xl transition-all shadow-md shadow-emerald-950/30">Reset Filters</button>
+                                            <button onClick={() => { setActiveTab("developer-hub"); }} className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium px-4 py-2 border border-slate-700 rounded-xl">Java Source Tree</button>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl hidden md:block">
+                                        <Icon name="Cpu" className="h-28 w-28 text-slate-700 animate-pulse" />
+                                    </div>
+                                </div>
+
+                                {/* Horizontal filter widgets */}
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800/60 pb-5">
+                                    <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+                                        <button onClick={() => setSelectedCategory("")} className={`px-3 py-1.5 rounded-xl text-xs font-medium border ${selectedCategory === "" ? "bg-white text-slate-950 border-slate-200" : "bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700"}`}>All Items</button>
+                                        {categories.map((cat, idx) => (
+                                            <button key={idx} onClick={() => setSelectedCategory(cat)} className={`px-3 py-1.5 rounded-xl text-xs font-medium border ${selectedCategory === cat ? "bg-white text-slate-950 border-slate-200" : "bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700"}`}>{cat}</button>
+                                        ))}
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        <span className="text-xs font-mono text-slate-500 uppercase">Condition:</span>
+                                        <select value={selectedCondition} onChange={(e) => setSelectedCondition(e.target.value)} className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                                            <option value="">All Grades</option>
+                                            <option value="LIKE_NEW">Like New</option>
+                                            <option value="EXCELLENT">Excellent</option>
+                                            <option value="VERY_GOOD">Very Good</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Catalog Grid */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {products.filter(p => (!selectedCategory || p.category === selectedCategory) && (!selectedCondition || p.conditionGrade === selectedCondition)).map(prod => (
+                                        <div key={prod.id} className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col group relative">
+                                            <span className="absolute top-3 left-3 z-10 px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase border bg-slate-950/80 border-slate-800 text-emerald-400">{prod.conditionGrade.replace("_", " ")}</span>
+                                            <button onClick={() => handleToggleWishlist(prod)} className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-slate-950/80 border border-slate-800/50 text-slate-400 hover:text-rose-400 transition-colors">
+                                                <Icon name="Heart" className={`h-4 w-4 ${wishlist.some(w => w.id === prod.id) ? "fill-rose-500 text-rose-500" : ""}`} />
+                                            </button>
+                                            <div className="h-44 bg-slate-950 overflow-hidden cursor-pointer" onClick={() => setSelectedProduct(prod)}>
+                                                <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                            </div>
+                                            <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
+                                                <div className="space-y-1" onClick={() => setSelectedProduct(prod)}>
+                                                    <span className="text-[10px] text-slate-500 font-mono">{prod.brand} • {prod.category}</span>
+                                                    <h3 className="font-bold text-sm text-slate-100 group-hover:text-emerald-400 transition-colors line-clamp-1">{prod.name}</h3>
+                                                    <div className="flex items-center gap-1 text-amber-400 text-xs font-mono">
+                                                        <Icon name="Star" className="h-3 w-3 fill-amber-400" />
+                                                        <span>{prod.rating}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between">
+                                                    <div>
+                                                        <p className="text-[9px] font-mono text-slate-500 uppercase">Outlet Price</p>
+                                                        <span className="text-base font-bold text-slate-100 font-mono">Rs. {prod.price.toLocaleString()}</span>
+                                                    </div>
+                                                    <div className="flex gap-1.5">
+                                                        <button onClick={() => handleAddToCart(prod)} className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs">Add</button>
+                                                        <button onClick={() => setSelectedProduct(prod)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs border border-slate-700">Details</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Tab View: Product Details */}
+                        {selectedProduct && (
+                            <div className="space-y-6 animate-fade-in">
+                                <button onClick={() => setSelectedProduct(null)} className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-white uppercase font-mono">
+                                    <Icon name="ArrowLeft" className="h-3.5 w-3.5" /> Back to Storefront
+                                </button>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-slate-900 border border-slate-800 rounded-3xl p-6">
+                                    <div className="lg:col-span-5 space-y-4">
+                                        <div className="h-64 rounded-2xl overflow-hidden bg-slate-950 border border-slate-800">
+                                            <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="w-full h-full object-cover" />
+                                        </div>
+                                        <div className="bg-slate-950/60 p-4 border border-slate-800 rounded-xl space-y-2">
+                                            <h4 className="text-xs font-mono text-slate-300 flex items-center gap-1.5">
+                                                <Icon name="ShieldCheck" className="h-4 w-4 text-emerald-400" /> 45-POINT ENGINEERING AUDIT PASS
+                                            </h4>
+                                            <p className="text-[11px] text-slate-400 leading-relaxed">{selectedProduct.refurbishedDetails}</p>
+                                        </div>
+                                    </div>
+                                    <div className="lg:col-span-7 space-y-5">
+                                        <div>
+                                            <span className="text-xs font-mono text-emerald-400">{selectedProduct.brand} • {selectedProduct.category}</span>
+                                            <h1 className="text-2xl font-extrabold text-slate-100">{selectedProduct.name}</h1>
+                                        </div>
+                                        <div className="bg-slate-950/40 p-4 border border-slate-800 rounded-xl flex items-center justify-between">
+                                            <div>
+                                                <span className="text-[9px] text-slate-500 uppercase">Clearance Offer</span>
+                                                <div className="text-xl font-bold font-mono">Rs. {selectedProduct.price.toLocaleString()}</div>
+                                            </div>
+                                            <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono px-2.5 py-1 rounded-lg">Warranty: 1-Year Hardware</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-xs font-bold text-slate-300 uppercase">Features & Specs</h3>
+                                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                                {Object.entries(selectedProduct.specifications).map(([k, v]) => (
+                                                    <div key={k} className="p-2.5 bg-slate-950/30 border border-slate-800 rounded-lg">
+                                                        <span className="block text-[9px] text-slate-500 font-mono uppercase">{k}</span>
+                                                        <span className="block text-slate-200 mt-0.5">{v}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => handleAddToCart(selectedProduct)} className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs uppercase">Add to Shopping Bag</button>
+                                            <button onClick={() => handleToggleWishlist(selectedProduct)} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl border border-slate-700"><Icon name="Heart" className="h-4.5 w-4.5" /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Tab View: Cart & checkout */}
+                        {activeTab === "cart" && (
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in">
+                                <div className="lg:col-span-7 space-y-4">
+                                    <h2 className="text-xl font-extrabold text-white">Your Shopping Bag ({cart.length} items)</h2>
+                                    {cart.length === 0 ? (
+                                        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-500 text-xs space-y-2">
+                                            <Icon name="ShoppingBag" className="h-8 w-8 text-slate-600 animate-bounce mx-auto" />
+                                            <p className="font-mono">YOUR SHOPPING BAG IS CURRENTLY EMPTY</p>
+                                            <button onClick={() => setActiveTab("home")} className="bg-emerald-600 text-slate-950 font-semibold px-4 py-2 rounded-xl text-xs">Browse Products</button>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {cart.map((item, idx) => (
+                                                <div key={idx} className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between gap-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-14 w-14 bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+                                                            <img src={item.product.imageUrl} className="w-full h-full object-cover" />
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-xs font-bold text-slate-200 line-clamp-1">{item.product.name}</h4>
+                                                            <span className="text-[11px] text-emerald-400 font-mono">Rs. {item.product.price.toLocaleString()}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-xs font-mono text-slate-400">Qty: {item.quantity}</span>
+                                                        <button onClick={() => handleRemoveCart(item.product.id)} className="text-rose-400 hover:text-rose-300 text-xs font-mono"><Icon name="Trash2" className="h-4 w-4" /></button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 h-fit">
+                                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">Checkout Summary</h3>
+                                    <div className="space-y-1.5 text-xs text-slate-400">
+                                        <div className="flex justify-between"><span>Subtotal</span><span className="font-mono text-slate-200">Rs. {cart.reduce((s,i)=>s+(i.product.price*i.quantity),0).toLocaleString()}</span></div>
+                                        <div className="flex justify-between"><span>Active Code</span><span className="font-mono text-emerald-400">{activeCoupon ? "- 20%" : "None"}</span></div>
+                                        <div className="flex justify-between border-t border-slate-800 pt-2 font-bold text-slate-200"><span>Grand Total</span><span className="font-mono text-emerald-400 text-sm">Rs. {(cart.reduce((s,i)=>s+(i.product.price*i.quantity),0) * (activeCoupon ? 0.8 : 1)).toLocaleString()}</span></div>
+                                    </div>
+                                    <div className="space-y-2 pt-2 border-t border-slate-800">
+                                        <label className="block text-[10px] text-slate-500 font-mono uppercase">Enter Discount Coupon</label>
+                                        <div className="flex gap-2">
+                                            <input type="text" placeholder="e.g. REFURB20" value={couponCode} onChange={(e)=>setCouponCode(e.target.value)} className="bg-slate-950 text-xs px-3 py-2 border border-slate-800 rounded-lg focus:outline-none flex-1 text-slate-200" />
+                                            <button onClick={handleApplyCoupon} className="bg-slate-800 border border-slate-700 text-slate-300 text-xs px-3 rounded-lg font-semibold">Apply</button>
+                                        </div>
+                                        {couponError && <p className="text-[10px] text-rose-400 font-sans">{couponError}</p>}
+                                    </div>
+                                    {cart.length > 0 && (
+                                        <button onClick={handlePlaceOrder} className="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold py-2.5 rounded-xl uppercase">Place Certified Order</button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Tab View: Order success tracker */}
+                        {activeTab === "order-success" && activeTrackingOrder && (
+                            <div className="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center space-y-6 animate-fade-in">
+                                <div className="p-3 bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 rounded-full w-fit mx-auto">
+                                    <Icon name="CheckCircle2" className="h-10 w-10" />
+                                </div>
+                                <div className="space-y-1">
+                                    <h2 className="text-xl font-extrabold text-white">Order Confirmed!</h2>
+                                    <p className="text-xs text-slate-400">Order ID: <strong className="text-slate-300 font-mono">{activeTrackingOrder.id}</strong> • Queue Position: #3</p>
+                                </div>
+                                <div className="border-t border-slate-800 pt-4 space-y-3 text-left">
+                                    <h4 className="text-xs font-mono text-slate-500 uppercase tracking-wider">Live Engineering Tracker</h4>
+                                    <div className="space-y-4">
+                                        {activeTrackingOrder.tracking.map((step, idx) => (
+                                            <div key={idx} className="flex items-start gap-3">
+                                                <div className={`p-1 rounded-full ${step.done ? "bg-emerald-600/20 text-emerald-400 border border-emerald-500/30" : "bg-slate-950 text-slate-700 border border-slate-800"}`}>
+                                                    <Icon name="CheckCircle2" className="h-4 w-4" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-semibold text-slate-200">{step.status}</p>
+                                                    <span className="text-[10px] text-slate-500 font-mono">{step.date}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button onClick={() => setActiveTab("home")} className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-5 py-2 rounded-xl border border-slate-700">Continue Shopping</button>
+                            </div>
+                        )}
+
+                        {/* Tab View: Developer Hub */}
+                        {activeTab === "developer-hub" && (
+                            <div className="space-y-6 animate-fade-in">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                    <div>
+                                        <h2 className="text-xl font-bold text-white flex items-center gap-2">Spring Boot & REST API Developer Hub <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-2.5 py-0.5 rounded-full border border-indigo-500/20 font-mono">Internship Src</span></h2>
+                                        <p className="text-xs text-slate-400 mt-1">Audit JPA repositories, mock REST payloads, or convert your React TSX elements directly to server-side Java models.</p>
+                                    </div>
+                                    <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+                                        <button onClick={() => setDevTab("explorer")} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${devTab === "explorer" ? "bg-indigo-600 text-white" : "text-slate-400"}`}>Source Explorer</button>
+                                        <button onClick={() => setDevTab("compiler")} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${devTab === "compiler" ? "bg-indigo-600 text-white" : "text-slate-400"}`}>TSX to Java/HTML</button>
+                                    </div>
+                                </div>
+
+                                {devTab === "explorer" ? (
+                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                                        <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl h-[480px] flex flex-col overflow-hidden">
+                                            <div className="bg-slate-950 p-3.5 border-b border-slate-800 flex justify-between items-center">
+                                                <span className="text-xs font-mono font-bold text-slate-300">Java Spring Boot Src Tree</span>
+                                                <button onClick={() => { navigator.clipboard.writeText(selectedFile.content); triggerLocalAlert("Copied", "Java code copied successfully!"); }} className="bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs px-2.5 py-1 rounded border border-slate-700 font-mono">Copy File</button>
+                                            </div>
+                                            <div className="flex flex-1 overflow-hidden">
+                                                <div className="w-1/3 border-r border-slate-800 bg-slate-950/20 p-2 space-y-1 overflow-y-auto">
+                                                    {JAVA_FILES.map((f, i) => (
+                                                        <button key={i} onClick={() => setSelectedFile(f)} className={`w-full p-2 text-left rounded-lg text-xs transition-all ${selectedFile.name === f.name ? "bg-indigo-600/10 border-l-2 border-indigo-500 text-indigo-300 font-bold" : "text-slate-400 hover:bg-slate-800"}`}>{f.name}</button>
+                                                    ))}
+                                                </div>
+                                                <div className="flex-1 bg-slate-950 p-4 overflow-auto text-xs font-mono text-slate-300 leading-relaxed whitespace-pre">
+                                                    <code>{selectedFile.content}</code>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl h-[480px] flex flex-col overflow-hidden">
+                                            <div className="bg-slate-950 p-3.5 border-b border-slate-800">
+                                                <span className="text-xs font-mono font-bold text-slate-300">Live REST Client Playground</span>
+                                            </div>
+                                            <div className="p-4 space-y-4 flex-1 flex flex-col overflow-hidden">
+                                                <div className="space-y-1 shrink-0">
+                                                    <label className="text-[10px] font-mono text-slate-500 uppercase">Select API Endpoint</label>
+                                                    <div className="space-y-1 max-h-[140px] overflow-y-auto pr-1">
+                                                        {API_ENDPOINTS.map((api, idx) => (
+                                                            <button key={idx} onClick={() => { setApiSelected(api); handleExecuteApi(api); }} className={`w-full p-2 border text-left rounded-lg flex items-center justify-between text-xs transition-all ${apiSelected.path === api.path ? "bg-indigo-600/10 border-indigo-500 text-slate-200" : "bg-slate-950/30 border-slate-800 hover:border-slate-700 text-slate-400"}`}>
+                                                                <span className="font-mono">{api.path}</span>
+                                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800">{api.method}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3.5 flex flex-col overflow-hidden">
+                                                    <span className="text-[9px] font-mono text-indigo-400 border-b border-slate-800 pb-1 mb-2 uppercase block">JSON Client Response</span>
+                                                    <div className="flex-1 overflow-auto text-xs font-mono text-slate-400 whitespace-pre">
+                                                        {isApiLoading ? (
+                                                            <p className="text-slate-600 italic">Sending dynamic request...</p>
+                                                        ) : apiLogs ? (
+                                                            <code>{JSON.stringify(apiLogs.body, null, 2)}</code>
+                                                        ) : (
+                                                            <p className="text-slate-600 italic">Select an API above to run simulated response pipeline.</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                                        <div className="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col space-y-3 h-[480px]">
+                                            <div className="flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                                <span className="text-xs font-mono font-bold text-slate-300">TSX React Input Source</span>
+                                                <select onChange={(e) => { const s = SAMPLE_SNIPPETS.find(snippet=>snippet.name===e.target.value); if(s) { setCompilerInput(s.code); setCompilerTargetType(s.type); } }} className="bg-slate-900 border border-slate-700 text-[10px] px-2 py-1 rounded text-slate-200">
+                                                    {SAMPLE_SNIPPETS.map((s,i)=><option key={i} value={s.name}>{s.name}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="flex items-center gap-2 bg-slate-950/40 p-2.5 rounded-xl border border-slate-800">
+                                                <span className="text-xs text-slate-400">Target Type:</span>
+                                                <select value={compilerTargetType} onChange={(e)=>setCompilerTargetType(e.target.value)} className="bg-slate-900 border border-slate-700 text-xs px-2 py-1 rounded text-slate-200 focus:outline-none">
+                                                    <option value="Controller">REST Controller</option>
+                                                    <option value="Entity">JPA Entity</option>
+                                                    <option value="Service">Enterprise Service</option>
+                                                    <option value="HTML">Static HTML & Tailwind (.html)</option>
+                                                </select>
+                                            </div>
+                                            <textarea value={compilerInput} onChange={(e)=>setCompilerInput(e.target.value)} placeholder="Paste component TSX code..." className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-indigo-500 resize-none" />
+                                            <button onClick={handleCompile} disabled={isCompiling} className="bg-indigo-600 hover:bg-indigo-500 text-white font-sans text-xs font-bold py-2 rounded-xl transition-all">{isCompiling ? "Compiling..." : "Translate Source Module"}</button>
+                                        </div>
+                                        <div className="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col space-y-3 h-[480px]">
+                                            <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                                <span className="text-xs font-mono font-bold text-slate-300">Translated File Output</span>
+                                            </div>
+                                            {compilerMessage && <div className="p-2 rounded bg-indigo-950/20 border border-indigo-800/30 text-[10px] font-mono text-indigo-400">{compilerMessage}</div>}
+                                            <div className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3.5 overflow-auto text-xs font-mono text-slate-300 whitespace-pre">
+                                                <code>{compilerOutput || "Click translate to view Spring Boot conversion specifications."}</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Tab View: Admin Analytics */}
+                        {activeTab === "admin" && (
+                            <div className="space-y-6 animate-fade-in">
+                                <div className="border-b border-slate-800/60 pb-4">
+                                    <h2 className="text-xl font-bold text-white flex items-center gap-1.5"><Icon name="Cpu" className="text-amber-500 h-5 w-5" /> Storefront Metrics Dashboard</h2>
+                                    <p className="text-xs text-slate-400 mt-1">Live telemetry analytics measuring simulated checkout frequencies, category metrics, and operational performance.</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2">
+                                        <span className="text-xs font-mono text-slate-500 uppercase">Gross Simulated Revenue</span>
+                                        <h3 className="text-2xl font-extrabold font-mono text-white">Rs. {orders.reduce((sum,o)=>sum+o.total,0).toLocaleString()}</h3>
+                                        <p className="text-[10px] text-emerald-400 flex items-center gap-1">↑ 18.2% vs previous period</p>
+                                    </div>
+                                    <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2">
+                                        <span className="text-xs font-mono text-slate-500 uppercase">Total Logged Audits</span>
+                                        <h3 className="text-2xl font-extrabold font-mono text-white">{orders.length * 3} Devices</h3>
+                                        <p className="text-[10px] text-indigo-400">45-point checks validated</p>
+                                    </div>
+                                    <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2">
+                                        <span className="text-xs font-mono text-slate-500 uppercase">Warranty Claim Rate</span>
+                                        <h3 className="text-2xl font-extrabold font-mono text-white">0.02 %</h3>
+                                        <p className="text-[10px] text-emerald-400">Excellent repair tolerance</p>
+                                    </div>
+                                </div>
+
+                                {/* Custom Charts visualization */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
+                                        <h4 className="text-xs font-mono font-bold text-slate-300 uppercase">Simulated Sales by Category</h4>
+                                        <div className="space-y-3">
+                                            {[
+                                                { label: "Smartphones", count: 85, color: "bg-emerald-500" },
+                                                { label: "Laptops", count: 62, color: "bg-indigo-500" },
+                                                { label: "Tablets", count: 40, color: "bg-amber-500" },
+                                                { label: "Audio & Accessories", count: 30, color: "bg-teal-500" }
+                                            ].map((item, idx) => (
+                                                <div key={idx} className="space-y-1 text-xs">
+                                                    <div className="flex justify-between font-medium">
+                                                        <span className="text-slate-300">{item.label}</span>
+                                                        <span className="font-mono text-slate-400">{item.count} orders</span>
+                                                    </div>
+                                                    <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+                                                        <div className={`${item.color} h-full rounded-full`} style={{ width: `${(item.count / 85) * 100}%` }}></div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                                        <div>
+                                            <h4 className="text-xs font-mono font-bold text-slate-300 uppercase">Bi-weekly Revenue Pipeline</h4>
+                                            <div className="flex items-end gap-3 h-44 pt-6 pb-2">
+                                                {[35, 45, 28, 55, 68, 80, 92].map((v, i) => (
+                                                    <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                                                        <div className="w-full bg-emerald-500 hover:bg-emerald-400 rounded-md transition-all cursor-pointer" style={{ height: `${v}%` }} title={`Rs. ${v * 2000}`}></div>
+                                                        <span className="text-[9px] font-mono text-slate-500">W{i+1}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] text-slate-500 text-center leading-relaxed font-sans">Automated reporting updates every 12 hours from database telemetry feeds.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                    </main>
+
+                    {/* Floating Chat Support Widget */}
+                    <div className="fixed bottom-6 right-6 z-50">
+                        {isChatOpen ? (
+                            <div className="bg-slate-900 border border-slate-800 shadow-2xl rounded-2xl w-80 sm:w-96 h-[420px] flex flex-col overflow-hidden animate-fade-in">
+                                <div className="bg-slate-950 p-4 border-b border-slate-800 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                                            <Icon name="Bot" className="h-4 w-4" />
+                                        </div>
+                                        <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">Outlet Support Bot</span>
+                                    </div>
+                                    <button onClick={() => setIsChatOpen(false)} className="text-slate-400 hover:text-white"><Icon name="Minus" className="h-4 w-4" /></button>
+                                </div>
+                                <div className="flex-1 p-4 overflow-y-auto space-y-3.5 flex flex-col">
+                                    {chatMessages.map((msg, i) => (
+                                        <div key={i} className={`p-3 rounded-2xl text-xs max-w-[80%] ${msg.sender === "bot" ? "bg-slate-950/60 text-slate-300 self-start" : "bg-emerald-600 text-slate-950 font-medium self-end"}`}>
+                                            {msg.text}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="p-3 border-t border-slate-800/80 bg-slate-950/30 flex gap-2">
+                                    <input type="text" placeholder="Type support inquiry..." value={chatInput} onChange={(e)=>setChatInput(e.target.value)} onKeyDown={(e)=>e.key === 'Enter' && handleSendChat()} className="bg-slate-950 border border-slate-800 text-xs px-3 py-2 rounded-xl focus:outline-none focus:border-emerald-500 flex-1 text-slate-200" />
+                                    <button onClick={handleSendChat} className="p-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 rounded-xl"><Icon name="ArrowRight" className="h-4 w-4" /></button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button onClick={() => setIsChatOpen(true)} className="p-4 bg-emerald-600 hover:bg-emerald-500 text-slate-950 rounded-full shadow-lg hover:scale-105 transition-all cursor-pointer">
+                                <Icon name="Bot" className="h-6 w-6" />
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    <footer className="bg-slate-900 border-t border-slate-850 py-6 mt-12">
+                        <div className="max-w-7xl mx-auto px-4 text-center text-slate-500 text-xs space-y-1">
+                            <p>© 2026 Outlet Gadgets Inc. All rights reserved.</p>
+                            <p className="font-mono text-[10px]">Compiled and bundled dynamically inside a standalone HTML viewport. Unlocking 100% offline-first portability.</p>
+                        </div>
+                    </footer>
+
+                </div>
+            );
+        }
+
+        // Mount standalone app
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+    </script>
+</body>
+</html>
