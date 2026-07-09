@@ -3,10 +3,114 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.json">
+    
     <title>My Google AI Studio App</title>
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- PWA: register service worker -->
+    <script> 
+      
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => console.log("ZeriqAI SW registered:", reg.scope))
+            .catch((err) => console.error("ZeriqAI SW registration failed:", err));
+        });
+      }
+    </script>
+     <!-- PWA: install prompt wiring -->
+    <script>
+      (function () {
+        const overlay = document.getElementById("install-overlay");
+        const installBtn = document.getElementById("btn-install-app");
+        const statusEl = document.getElementById("install-overlay-status");
+        const dismissBtn = document.getElementById("btn-install-dismiss");
+        const continueBtn = document.getElementById("btn-continue-browser");
+
+        const DISMISS_KEY = "zeriqai-install-dismissed"; // sessionStorage: cleared automatically on new session
+
+        function isStandalone() {
+          return (
+            window.matchMedia("(display-mode: standalone)").matches ||
+            window.navigator.standalone === true // iOS Safari
+          );
+        }
+
+        function showOverlay() {
+          overlay.classList.remove("hidden");
+          overlay.classList.add("flex");
+        }
+
+        function hideOverlay() {
+          overlay.classList.add("hidden");
+          overlay.classList.remove("flex");
+        }
+
+        let deferredPrompt = null;
+
+        // Only show the overlay when the app is genuinely NOT installed/running
+        // standalone, AND it hasn't been dismissed already this browser session.
+        const dismissedThisSession = sessionStorage.getItem(DISMISS_KEY) === "1";
+        if (!isStandalone() && !dismissedThisSession) {
+          showOverlay();
+        }
+
+        // Chrome/Edge/Android fire this when the app meets installability
+        // criteria. We intercept it so we can trigger it manually from our
+        // own button instead of the browser's mini-infobar.
+        window.addEventListener("beforeinstallprompt", (event) => {
+          event.preventDefault();
+          deferredPrompt = event;
+          installBtn.disabled = false;
+        });
+
+        installBtn.addEventListener("click", async () => {
+          if (!deferredPrompt) {
+            // No native prompt available (unsupported browser, iOS Safari,
+            // or criteria not yet met) — fall back to the manual steps
+            // already shown in the card instead of doing nothing silently.
+            statusEl.textContent =
+              "Your browser doesn't support one-tap install. Please use the steps above.";
+            return;
+          }
+
+          installBtn.disabled = true;
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log("ZeriqAI install prompt outcome:", outcome);
+          deferredPrompt = null;
+
+          if (outcome !== "accepted") {
+            installBtn.disabled = false;
+          }
+        });
+
+        // Fires once the app is actually installed — hide the overlay.
+        window.addEventListener("appinstalled", () => {
+          deferredPrompt = null;
+          hideOverlay();
+          console.log("ZeriqAI installed successfully");
+        });
+
+        // Close (X) — dismiss for this browser session only. It will
+        // reappear on the next new session if the app is still not installed.
+        dismissBtn.addEventListener("click", () => {
+          sessionStorage.setItem(DISMISS_KEY, "1");
+          hideOverlay();
+        });
+
+        // "Continue in Browser" — same dismissal as the X, just a second
+        // entry point for users who don't want to install right now.
+        continueBtn.addEventListener("click", () => {
+          sessionStorage.setItem(DISMISS_KEY, "1");
+          hideOverlay();
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
