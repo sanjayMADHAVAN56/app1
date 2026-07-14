@@ -246,10 +246,10 @@ export default function DeveloperHub() {
             </div>
 
             {/* Body: Left sidebar, Right Code viewer */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
               
               {/* Left Sidebar list */}
-              <div className="w-1/3 border-r border-slate-800/80 bg-slate-950/20 overflow-y-auto p-2 space-y-1">
+              <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-slate-800/80 bg-slate-950/20 overflow-y-auto p-2 space-y-1 h-[140px] md:h-full shrink-0 md:shrink">
                 {JAVA_FILES.map((file, idx) => (
                   <button
                     key={idx}
@@ -278,7 +278,7 @@ export default function DeveloperHub() {
               </div>
 
               {/* Right Terminal Panel */}
-              <div className="flex-1 bg-slate-950/80 flex flex-col overflow-hidden relative">
+              <div className="flex-1 bg-slate-950/80 flex flex-col overflow-hidden relative h-[300px] md:h-full">
                 {isLoadingFile ? (
                   <div className="flex-1 flex items-center justify-center text-slate-500 font-mono text-xs gap-2">
                     <RefreshCw className="h-4 w-4 animate-spin text-emerald-500" />

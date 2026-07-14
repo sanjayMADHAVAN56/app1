@@ -1626,9 +1626,9 @@ export default function App() {
       </main>
 
       {/* 3. FLOAT CHAT ASSISTANT WIDGET BOX */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+      <div className="fixed bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end max-w-[calc(100vw-2rem)] sm:max-w-none">
         {isChatOpen ? (
-          <div className="w-[320px] sm:w-[420px] mb-3 shadow-2xl">
+          <div className="w-[calc(100vw-2rem)] sm:w-[420px] mb-3 shadow-2xl">
             <ChatAssistant 
               onClose={() => setIsChatOpen(false)}
               onNavigateToProduct={(id) => {
