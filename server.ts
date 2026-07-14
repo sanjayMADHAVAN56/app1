@@ -259,6 +259,313 @@ const PRODUCTS: Product[] = [
     },
     refurbishedDetails: "Keycaps removed and ultrasonic-cleaned. PCB boards checked for solder corrosion. Stabilizers lubed for noise reduction. Fully tested wired and wireless modes.",
     imageUrl: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 11,
+    name: "PlayStation 5 Slim Digital Edition",
+    brand: "Sony",
+    category: "Gaming & Consoles",
+    originalPrice: 44900,
+    price: 32900,
+    rating: 4.9,
+    conditionGrade: "LIKE_NEW",
+    stock: 6,
+    description: "Certified refurbished PlayStation 5 Slim digital console. Features ultra-high speed 1TB SSD, near-instant load times, ray-tracing capability, and 3D Audio support. Includes original DualSense controller.",
+    specifications: {
+      "Storage": "1TB Custom High-Speed NVMe SSD",
+      "Performance": "4K 120Hz Output, HDR Support",
+      "Graphics": "Custom AMD RDNA 2 GPU with Ray Tracing",
+      "Accessories": "1x DualSense Wireless Controller included",
+      "Warranty": "1-Year OutletGadgets Warranty"
+    },
+    refurbishedDetails: "Thermal liquid metal compound refreshed on APU. Internal fans vacuumed of microdust. Blu-ray controller board firmware authenticated and optical ports sterilized.",
+    imageUrl: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&auto=format&fit=crop&q=60",
+    isFeatured: true
+  },
+  {
+    id: 12,
+    name: "Steam Deck OLED 512GB Handheld",
+    brand: "Valve",
+    category: "Gaming & Consoles",
+    originalPrice: 59900,
+    price: 41900,
+    rating: 4.8,
+    conditionGrade: "EXCELLENT",
+    stock: 4,
+    description: "Portable gaming powerhouse featuring a high-brightness HDR OLED panel, 90Hz refresh rate, longer battery performance, and premium haptics. Perfect for your entire Steam library on the go.",
+    specifications: {
+      "Display": "7.4-inch HDR OLED (90Hz, 1000 nits peak)",
+      "Processor": "6nm AMD APU (4 Cores / 8 Threads)",
+      "Storage": "512GB PCIe Gen3 NVMe SSD",
+      "Battery Life": "3 - 12 hours depending on TDP settings",
+      "Battery Health": "95% Capacity Certified"
+    },
+    refurbishedDetails: "Analogue thumbsticks inspected for potential stick drift (fully recalibrated). Battery test verified over 4.5 hours of continuous heavy load. Complete system factory reset and sanitization.",
+    imageUrl: "https://images.unsplash.com/photo-1598550476439-6847785fce6e?w=800&auto=format&fit=crop&q=60",
+    isFeatured: true
+  },
+  {
+    id: 13,
+    name: "Nintendo Switch OLED Model",
+    brand: "Nintendo",
+    category: "Gaming & Consoles",
+    originalPrice: 34900,
+    price: 23900,
+    rating: 4.7,
+    conditionGrade: "VERY_GOOD",
+    stock: 8,
+    description: "Refurbished hybrid gaming system with a vibrant 7-inch OLED screen, adjustable wide stand, dock with a wired LAN port, and 64GB of internal storage.",
+    specifications: {
+      "Display": "7.0-inch OLED Touch Screen",
+      "Storage": "64GB Internal (Expandable with MicroSD)",
+      "Play Modes": "TV, Tabletop, Handheld Modes supported",
+      "Joy-Cons": "Detachable Neon Red/Blue Controllers"
+    },
+    refurbishedDetails: "Rail sliders cleaned and lubed. Kickstand hinge tension optimized. Game card reader pin verification performed. Joy-Con joystick potentiometers thoroughly replaced to prevent drift.",
+    imageUrl: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 14,
+    name: "Sony Alpha A7 IV Mirrorless Camera",
+    brand: "Sony",
+    category: "Cameras & Content",
+    originalPrice: 219900,
+    price: 154900,
+    rating: 4.9,
+    conditionGrade: "EXCELLENT",
+    stock: 2,
+    description: "Exceptional hybrid mirrorless camera with 33MP Exmor R sensor, high-speed BIONZ XR processing engine, 4K 60p video, and real-time Autofocus tracking. Professional grade.",
+    specifications: {
+      "Sensor": "33.0 Megapixel Full-Frame Back-Illuminated CMOS",
+      "Stabilization": "5-Axis In-Body Image Stabilization (IBIS)",
+      "Autofocus": "759-point Phase Detection Real-time Eye AF",
+      "ISO Range": "Auto, 100 - 51200",
+      "Shutter Count": "Only 4,120 actuations"
+    },
+    refurbishedDetails: "Full sensor wet-clean performed by in-house camera laboratory. Viewfinder and main LCD screen scratch-inspected. Dial encoders lubricated for exact tactile feedback. Includes battery and charger.",
+    imageUrl: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop&q=60",
+    isFeatured: true
+  },
+  {
+    id: 15,
+    name: "DJI Mini 3 Pro Fly More Combo",
+    brand: "DJI",
+    category: "Cameras & Content",
+    originalPrice: 94900,
+    price: 59900,
+    rating: 4.8,
+    conditionGrade: "EXCELLENT",
+    stock: 3,
+    description: "Lightweight, sub-249g foldable camera drone with 4K HDR video capability, true vertical shooting, tri-directional obstacle sensing, and 34-minute flight time per battery pack.",
+    specifications: {
+      "Weight": "249g (No registration required in most areas)",
+      "Video Quality": "4K HDR at 60fps / 48MP Photo Sensor",
+      "Sensing": "Forward, Backward, and Downward Obstacle Detection",
+      "Kit Includes": "RC Remote Controller, 3x Intelligent Flight Batteries, Charger Hub, Bag"
+    },
+    refurbishedDetails: "IMU and gimbal calibration verified. Brushless motors tested for perfect concentric rotation. Propeller blades fully replaced with brand new original parts. Includes comprehensive flight test log.",
+    imageUrl: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 16,
+    name: "Google Pixel 8 Pro 128GB",
+    brand: "Google",
+    category: "Smartphones",
+    originalPrice: 109999,
+    price: 62900,
+    rating: 4.7,
+    conditionGrade: "LIKE_NEW",
+    stock: 5,
+    description: "Premium Google flagship smartphone with cutting edge Google Tensor G3 chip, AI Magic Eraser, Best Take photography capabilities, and a gorgeous 120Hz LTPO OLED display.",
+    specifications: {
+      "Chipset": "Google Tensor G3 with Titan M2 security",
+      "Display": "6.7-inch Super Actua OLED (120Hz, 2400 nits peak)",
+      "Camera": "50MP Main + 48MP Wide + 48MP 5x Zoom with Telephoto",
+      "Battery Health": "96% (Original Battery)"
+    },
+    refurbishedDetails: "Screen digitizer and biometric face/fingerprint scanners passed absolute performance check. Motherboard flashed with the latest clean Android image. Clean IMEI, unlocked.",
+    imageUrl: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 17,
+    name: "Samsung Galaxy Tab S9 Ultra (Wi-Fi)",
+    brand: "Samsung",
+    category: "Tablets",
+    originalPrice: 108999,
+    price: 74900,
+    rating: 4.8,
+    conditionGrade: "LIKE_NEW",
+    stock: 4,
+    description: "Colossal 14.6-inch Android tablet featuring Snapdragon 8 Gen 2 processor, dynamic 120Hz AMOLED screen, IP68 water resistance rating, and professional-grade S-Pen stylus.",
+    specifications: {
+      "Display": "14.6-inch Dynamic AMOLED 2X (120Hz, HDR10+)",
+      "Processor": "Snapdragon 8 Gen 2 for Galaxy",
+      "RAM/Storage": "12GB RAM, 256GB Storage (Expandable)",
+      "Accessories": "Included S-Pen, Premium cover guard"
+    },
+    refurbishedDetails: "Prisine condition screen with zero OLED burn-in. Pressure sensitivity mapping on glass tested perfectly against included S-Pen. Cleaned and factory reset.",
+    imageUrl: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 18,
+    name: "Asus ROG Zephyrus G14 Gaming Laptop",
+    brand: "Asus",
+    category: "Laptops",
+    originalPrice: 149900,
+    price: 98900,
+    rating: 4.8,
+    conditionGrade: "EXCELLENT",
+    stock: 2,
+    description: "Compact ultraportable gaming marvel driven by Ryzen 9 processor and NVIDIA RTX 4060 graphics. High-contrast 120Hz Display, AniMe Matrix back lid, and outstanding cooling system.",
+    specifications: {
+      "Processor": "AMD Ryzen 9 7940HS (8 Cores, 16 Threads)",
+      "Graphics": "NVIDIA GeForce RTX 4060 8GB GDDR6",
+      "RAM/Storage": "16GB DDR5 RAM, 1TB NVMe Gen4 SSD",
+      "Display": "14-inch QHD+ 165Hz ROG Nebula Display",
+      "Battery Health": "93% Original Capacity"
+    },
+    refurbishedDetails: "Completely repasted CPU and GPU with premium Noctua thermal compound. Fans deep cleaned and fan bearings lubricated. Keyboard backlighting and key-stroke responses verified at 100%.",
+    imageUrl: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 19,
+    name: "Microsoft Surface Pro 9",
+    brand: "Microsoft",
+    category: "Laptops",
+    originalPrice: 115000,
+    price: 68900,
+    rating: 4.6,
+    conditionGrade: "VERY_GOOD",
+    stock: 5,
+    description: "Perfect 2-in-1 hybrid laptop combining tablet versatility with laptop performance. Powered by Intel Evo Core i5, gorgeous PixelSense touchscreen, and adjustable kickstand.",
+    specifications: {
+      "Processor": "12th Gen Intel Core i5-1235U",
+      "RAM": "8GB LPDDR5 RAM",
+      "Storage": "256GB Removable SSD",
+      "Display": "13-inch PixelSense Flow Display (120Hz Refresh)",
+      "Battery Health": "90% capacity"
+    },
+    refurbishedDetails: "Kickstand pivot friction test passed. Surface Type-Cover connectors thoroughly cleaned with contact cleaner. Screen has a tiny microscopic line on backplate casing, purely cosmetic.",
+    imageUrl: "https://images.unsplash.com/photo-1585776245991-cf89dd7fc73a?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 20,
+    name: "Apple HomePod (2nd Generation)",
+    brand: "Apple",
+    category: "Smart Home & IoT",
+    originalPrice: 32900,
+    price: 21900,
+    rating: 4.7,
+    conditionGrade: "LIKE_NEW",
+    stock: 6,
+    description: "Immersive high-fidelity smart speaker featuring advanced acoustic design, beamforming tweeters, room-sensing technology, spatial audio, and smart Siri integrations.",
+    specifications: {
+      "Audio": "4-inch high-excursion woofer, array of 5 horn-loaded tweeters",
+      "Sensors": "Room-sensing, Temperature, Humidity sensors, Accelerometer",
+      "Connectivity": "802.11n Wi-Fi, Bluetooth 5.0, Thread, AirPlay 2",
+      "Condition": "Pristine white fabric, original power cord included"
+    },
+    refurbishedDetails: "Internal microphone array calibrated. Bass woofer air-pressure relief valve checked. Mesh fabric detailed and sanitized with dry-steam technology.",
+    imageUrl: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 21,
+    name: "Philips Hue Starter Kit (Warm to Cool White)",
+    brand: "Philips",
+    category: "Smart Home & IoT",
+    originalPrice: 15999,
+    price: 8900,
+    rating: 4.5,
+    conditionGrade: "EXCELLENT",
+    stock: 9,
+    description: "Premium smart lighting starter kit. Includes 3 smart LED bulbs (fitting standard B22 bases), the Hue Bridge router, and a custom wireless dimmer remote. Command millions of custom scenes.",
+    specifications: {
+      "Light Output": "800 Lumens per bulb, 2200K - 6500K spectrum",
+      "Bridge Connectivity": "Zigbee protocol (Supports up to 50 smart bulbs)",
+      "Compatibility": "Apple HomeKit, Google Home, Alexa, SmartThings"
+    },
+    refurbishedDetails: "Bridge micro-controller flashed with the latest secure firmware. Bulb elements checked for lumen degradation. Dimmer switch batteries replaced with fresh CR2032 cells.",
+    imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 22,
+    name: "Google Nest Hub Max Smart Display",
+    brand: "Google",
+    category: "Smart Home & IoT",
+    originalPrice: 22900,
+    price: 12900,
+    rating: 4.6,
+    conditionGrade: "VERY_GOOD",
+    stock: 7,
+    description: "Ultimate smart home commander with 10-inch HD screen, built-in Nest Security Camera, stereo speakers with integrated subwoofer, and Google Assistant.",
+    specifications: {
+      "Display": "10-inch HD Touchscreen",
+      "Camera": "6.5-megapixel camera with 127-degree wide field-of-view",
+      "Speakers": "Stereo (2x 18mm tweeters, 1x 75mm woofer)",
+      "Privacy": "Hardware mute switch for microphone and camera"
+    },
+    refurbishedDetails: "Slight cosmetic scuffing on fabric base. Camera lens tested for focus clarity. Speaker array tested at full volume with bass sweeps; no acoustic distortion detected.",
+    imageUrl: "https://images.unsplash.com/photo-1567449303078-57bd995bd375?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 23,
+    name: "Bose QuietComfort Ultra Headphones",
+    brand: "Bose",
+    category: "Audio & Accessories",
+    originalPrice: 35900,
+    price: 24900,
+    rating: 4.8,
+    conditionGrade: "LIKE_NEW",
+    stock: 5,
+    description: "Bose flagship active noise-cancelling headphones featuring groundbreaking Immersive Audio, world-class quietness, CustomTune custom sound profiling, and premium luxury leather design.",
+    specifications: {
+      "ANC Modes": "Quiet Mode, Aware Mode, Immersion Mode",
+      "Battery": "Up to 24 hours playback on a single charge",
+      "Microphones": "12 microphones total for incredible voice capture",
+      "Weight": "252 grams"
+    },
+    refurbishedDetails: "Sanitized and detailed. Dynamic driver frequency swept from 10Hz to 22kHz to verify absolute performance. Memory foam headband and ear pads replaced with brand new Bose OEM replacements.",
+    imageUrl: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 24,
+    name: "Sonos Era 100 Smart Speaker",
+    brand: "Sonos",
+    category: "Audio & Accessories",
+    originalPrice: 29900,
+    price: 19900,
+    rating: 4.7,
+    conditionGrade: "EXCELLENT",
+    stock: 6,
+    description: "Superb acoustics meet next-gen design. The Sonos Era 100 delivers room-filling stereo sound, deep rich bass, and dual-angled tweeters. Supports Wi-Fi, Bluetooth, and Aux inputs.",
+    specifications: {
+      "Amplifiers": "Three class-D digital amplifiers tuned for acoustics",
+      "Tweeters": "Two angled tweeters create high-frequency response",
+      "Woofer": "One mid-woofer ensures deep low-frequency bass",
+      "Trueplay Tuning": "Acoustic space calibration technology"
+    },
+    refurbishedDetails: "Ethernet and line-in ports connectivity checked. Trueplay spatial calibration mic module tested and verified. Chassis deep-cleaned and detailed.",
+    imageUrl: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&auto=format&fit=crop&q=60"
+  },
+  {
+    id: 25,
+    name: "Logitech MX Master 3S Wireless Mouse",
+    brand: "Logitech",
+    category: "Audio & Accessories",
+    originalPrice: 10995,
+    price: 6900,
+    rating: 4.9,
+    conditionGrade: "LIKE_NEW",
+    stock: 12,
+    description: "Master productivity mouse with 8K DPI tracking, ultra-quiet MagSpeed electromagnetic scrolling wheel, ergonomic thumb cradle, and dual Bluetooth/Logi Bolt wireless connectivity.",
+    specifications: {
+      "Sensor": "8000 DPI Darkfield high precision glass tracker",
+      "Scroll Wheel": "MagSpeed electromagnetic steel smart scroll",
+      "Buttons": "7 customizable buttons, gesture button, thumb wheel",
+      "Battery Life": "Up to 70 days on a full charge (USB-C)"
+    },
+    refurbishedDetails: "Thumb wheel potentiometer and primary switches replaced with fresh heavy-duty Silent-Clicks. Teflon glide pads replaced on bottom surface. Sanitized and packed.",
+    imageUrl: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=800&auto=format&fit=crop&q=60"
   }
 ];
 
